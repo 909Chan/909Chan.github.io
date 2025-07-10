@@ -1,1 +1,49 @@
-# 909Chan.github.io
+<!DOCTYPE html>
+<html>
+<head>
+  <title>4chan Clone</title>
+  <style>
+    body { font-family: Arial; background: #f0e0d6; padding: 20px; }
+    .post { background: white; border: 1px solid #999; margin: 10px 0; padding: 15px; }
+    textarea { width: 100%; height: 100px; margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+  <h1>4chan Clone</h1>
+  <textarea id="postContent" placeholder="Your post..."></textarea>
+  <button onclick="postMessage()">Post</button>
+  <div id="posts"></div>
+
+  <script>
+    const API_URL = 'https://your-render-backend.onrender.com';
+    
+    async function loadPosts() {
+      const response = await fetch(`${API_URL}/posts`);
+      const posts = await response.json();
+      document.getElementById('posts').innerHTML = posts.map(post => `
+        <div class="post">
+          <strong>Anonymous</strong>
+          <p>${post.content}</p>
+          <small>${new Date(post.timestamp).toLocaleString()}</small>
+        </div>
+      `).join('');
+    }
+
+    async function postMessage() {
+      const content = document.getElementById('postContent').value.trim();
+      if (content) {
+        await fetch(`${API_URL}/posts`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content })
+        });
+        document.getElementById('postContent').value = '';
+        loadPosts();
+      }
+    }
+
+    // Load posts on page load
+    loadPosts();
+  </script>
+</body>
+</html>
